@@ -14,10 +14,11 @@ import Link from "next/link";
 import { navbarData } from "@/constants/Data";
 import { usePathname } from "next/navigation";
 import { getCurrentUser } from "@/lib/getCurrentUser";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { LogoutOutlined } from "@mui/icons-material";
 import { logoutAction } from "@/feature/auth/actions/logout.action";
 import { JwtPayload } from "jsonwebtoken";
+import CreditBalance from "@/feature/create/components/CreditBalance";
 type User = {
   id: string;
   name: string;
@@ -150,12 +151,42 @@ function UserMenu({ user }: { user: User }) {
 
 const Navbar = ({ user }: JwtPayload) => {
   const pathname = usePathname();
+  const [showNavBar, setShowNavBar] = useState(true);
+
+  useEffect(() => {
+    let lastScrollY = window.scrollY;
+    const handleScroll = () => {
+      const currentScollY = window.scrollY;
+      if (currentScollY <= 10) {
+        setShowNavBar(true);
+      } else if (currentScollY > lastScrollY) {
+        setShowNavBar(false);
+      } else if (currentScollY < lastScrollY) {
+        setShowNavBar(true);
+      }
+      lastScrollY = currentScollY;
+    };
+    window.addEventListener("scroll", handleScroll, {
+      passive: true,
+    });
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, []);
   return (
     <Box
       component="header"
       sx={{
-        position: "relative",
-        zIndex: 2,
+        position: "fixed",
+        top: 0,
+        left: 0,
+        zIndex: 1000,
+        width: "100%",
+        backgroundColor: "rgba(0, 0, 0, 0.45)",
+        backdropFilter: "blur(12px)",
+        WebkitBackdropFilter: "blur(12px)",
+        transform: showNavBar ? "translateY(0)" : "translateY(-100%)",
+        transition: "transform 0.3s ease",
       }}
     >
       <Container maxWidth="lg">
@@ -230,7 +261,17 @@ const Navbar = ({ user }: JwtPayload) => {
             })}
           </Stack>
           {user ? (
-            <UserMenu user={user} />
+            <Stack
+              direction="row"
+              spacing={1}
+              sx={{
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <UserMenu user={user} />
+              <CreditBalance userId={user.userId} />
+            </Stack>
           ) : (
             <Button
               component={Link}

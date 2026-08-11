@@ -8,6 +8,7 @@ import { connectDB } from "@/lib/Mongodb";
 import User from "@/models/User";
 import { createToken } from "@/lib/auth";
 import { cookies } from "next/headers";
+import Credit from "@/models/Credits";
 
 const signupSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
@@ -54,11 +55,15 @@ export async function signupAction(
     }
 
     const hashedPassword = await bcrypt.hash(password, 12);
-
     const user = await User.create({
       name,
       email,
       password: hashedPassword,
+    });
+
+    await Credit.create({
+      userId: user._id,
+      credits: 30,
     });
 
     const token = createToken({

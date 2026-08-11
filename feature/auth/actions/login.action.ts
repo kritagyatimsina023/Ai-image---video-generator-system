@@ -17,7 +17,7 @@ const loginSchema = z.object({
 
 export type LoginState = {
   error?: string;
-
+  hyperLink?: string;
   fieldErrors?: {
     email?: string[];
     password?: string[];
@@ -54,7 +54,8 @@ export async function loginAction(
 
     if (!user) {
       return {
-        error: "Invalid email or password.",
+        error: "No user found ! Create an account",
+        hyperLink: "/signup",
       };
     }
 

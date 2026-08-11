@@ -22,6 +22,7 @@ import { useEffect, useState } from "react";
 import { useActionState } from "react";
 import { loginAction } from "@/feature/auth/actions/login.action";
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 const inputSx = {
   "& .MuiOutlinedInput-root": {
@@ -63,9 +64,11 @@ export default function LoginPage() {
     error: "",
     fieldErrors: {},
   });
+  const router = useRouter();
   useEffect(() => {
     if (state.error) {
       toast.error(state.error);
+      if (state.hyperLink) return router.push(state.hyperLink);
     }
   }, [state.error, state]);
 
@@ -79,6 +82,7 @@ export default function LoginPage() {
         alignItems: "center",
         position: "relative",
         overflow: "hidden",
+
         py: 8,
       }}
     >
@@ -115,7 +119,6 @@ export default function LoginPage() {
           pointerEvents: "none",
         }}
       />
-
       <Container
         maxWidth="sm"
         sx={{
@@ -124,7 +127,6 @@ export default function LoginPage() {
         }}
       >
         <Stack spacing={4} sx={{ alignItems: "center" }}>
-          {/* Logo / Branding */}
           <Stack spacing={1.5} sx={{ alignItems: "center" }}>
             <Box
               sx={{

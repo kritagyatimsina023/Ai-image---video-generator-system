@@ -6,6 +6,7 @@ import Navbar from "@/layout/Navbar";
 import QueryProvider from "@/lib/QueryProvider";
 import { getCurrentUser } from "@/lib/getCurrentUser";
 import ToastProvider from "@/lib/ToasterProvider";
+import Credit from "@/models/Credits";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -24,6 +25,7 @@ export const metadata: Metadata = {
 
 export default async function RootLayout({ children }: LayoutProps<"/">) {
   const currentUser = await getCurrentUser();
+
   return (
     <html
       lang="en"

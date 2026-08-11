@@ -2,7 +2,11 @@
 import EmptyState from "@/feature/create/components/EmptyState";
 import GeneratedResult from "@/feature/create/components/GeneratedResult";
 import GeneratingUI from "@/feature/create/components/GeneratingUI";
-import { useGenerate } from "@/feature/create/hooks/useCreate";
+import {
+  useAutoScroll,
+  useGenerate,
+  useGenerationState,
+} from "@/feature/create/hooks/useCreate";
 import { useCreateStore } from "@/store/useCreateStore";
 import { useActionState, useEffect, useRef } from "react";
 import {
@@ -31,6 +35,8 @@ import { useState } from "react";
 import { generateAction } from "../generate.action";
 import { GenerateActionState, Generation } from "../generate.types";
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
+import { useQueryClient } from "@tanstack/react-query";
 
 interface createdHomeProps {
   promptData: Generation[];
@@ -76,34 +82,13 @@ const CreateHome = ({ promptData }: createdHomeProps) => {
   const { prompt, type, model, ratio, setPrompt, setType, setModel, setRatio } =
     useCreateStore();
   const containerRef = useRef<HTMLDivElement | null>(null);
+  const router = useRouter();
   const [state, formAction, isPending] = useActionState(
     generateAction,
     initialState,
   );
-  useEffect(() => {
-    if (state.error) {
-      toast.error(state.error);
-      return;
-    }
-    const errors = Object.values(state.fieldErrors ?? {})
-      .flat()
-      .filter(Boolean);
-
-    if (errors.length > 0) {
-      toast.error(errors.join(" • "));
-    }
-  }, [state]);
-
-  useEffect(() => {
-    if (!promptData.length) return;
-    const container = containerRef.current;
-    if (container) {
-      container.scrollTo({
-        top: container.scrollHeight,
-        behavior: "smooth",
-      });
-    }
-  }, [promptData.length]);
+  useAutoScroll(containerRef, promptData.length);
+  useGenerationState(state);
 
   return (
     <Box
@@ -116,48 +101,6 @@ const CreateHome = ({ promptData }: createdHomeProps) => {
         overflow: "hidden",
       }}
     >
-      {promptData.length === 0 && (
-        <Box
-          sx={{
-            flexShrink: 0,
-            px: { xs: 2, md: 4 },
-            pt: { xs: 8, md: 10 },
-            pb: 2,
-          }}
-        >
-          <Stack spacing={1}>
-            <Typography
-              sx={{
-                color: "#60a5fa",
-                fontSize: 13,
-                fontWeight: 600,
-              }}
-            >
-              AI CREATION STUDIO
-            </Typography>
-
-            <Typography
-              component="h1"
-              sx={{
-                fontSize: { xs: "2rem", md: "3rem" },
-                fontWeight: 800,
-                letterSpacing: "-.04em",
-              }}
-            >
-              Create your{" "}
-              <Box
-                component="span"
-                sx={{
-                  color: "#3b82f6",
-                }}
-              >
-                masterpiece.
-              </Box>
-            </Typography>
-          </Stack>
-        </Box>
-      )}
-
       {/* SCROLLABLE RESULTS */}
       <Box
         ref={containerRef}
@@ -166,7 +109,7 @@ const CreateHome = ({ promptData }: createdHomeProps) => {
           minHeight: 0,
           overflowY: "auto",
           px: { xs: 1, md: 3 },
-          pb: { xs: 3, md: 4 },
+          // py: { xs: 3, md: 20 },
 
           "&::-webkit-scrollbar": {
             width: 6,
@@ -190,7 +133,7 @@ const CreateHome = ({ promptData }: createdHomeProps) => {
             sx={{
               maxWidth: 900,
               mx: "auto",
-              py: 3,
+              pt: 13,
             }}
           >
             {promptData.map((item) => (
@@ -249,7 +192,39 @@ const CreateHome = ({ promptData }: createdHomeProps) => {
           }}
         >
           {/* Prompt */}
-          <Typography
+          {state.error && (
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "space-between",
+                gap: 2,
+                p: 1.5,
+                borderRadius: 2,
+                // border: "1px solid rgba(239, 68, 68, 0.25)",
+                bgcolor: "rgba(239, 68, 68, 0.08)",
+              }}
+            >
+              <Typography
+                sx={{
+                  fontSize: 13,
+                  fontWeight: 600,
+                }}
+              >
+                {state.error}
+              </Typography>
+
+              <Button
+                variant="contained"
+                size="small"
+                onClick={() => router.push("/pricing")}
+              >
+                Buy Credits
+              </Button>
+            </Box>
+          )}
+          {/* <Typography
             sx={{
               fontSize: 13,
               fontWeight: 600,
@@ -257,7 +232,7 @@ const CreateHome = ({ promptData }: createdHomeProps) => {
             }}
           >
             Your Prompt
-          </Typography>
+          </Typography> */}
 
           <TextField
             fullWidth

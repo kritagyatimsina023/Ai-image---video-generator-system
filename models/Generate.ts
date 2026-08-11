@@ -19,7 +19,6 @@ const generateSchema = new Schema<IGenerate>(
       required: true,
       index: true,
     },
-
     prompt: {
       type: String,
       required: true,

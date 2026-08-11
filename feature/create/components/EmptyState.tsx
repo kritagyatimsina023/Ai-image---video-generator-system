@@ -21,6 +21,7 @@ const EmptyState = ({ type = "video" }: EmptyStateProps) => {
           sm: 430,
           md: 320,
         },
+        py: 20,
         display: "flex",
         alignItems: "center",
         justifyContent: "center",

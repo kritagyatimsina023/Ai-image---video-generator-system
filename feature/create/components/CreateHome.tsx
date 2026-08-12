@@ -4,25 +4,20 @@ import GeneratedResult from "@/feature/create/components/GeneratedResult";
 import GeneratingUI from "@/feature/create/components/GeneratingUI";
 import {
   useAutoScroll,
-  useGenerate,
   useGenerationState,
 } from "@/feature/create/hooks/useCreate";
 import { useCreateStore } from "@/store/useCreateStore";
-import { useActionState, useEffect, useRef } from "react";
+import { useActionState, useRef } from "react";
 import {
   ArrowDownward,
-  AutoAwesomeRounded,
   ImageRounded,
   MovieCreationRounded,
-  PlayArrowRounded,
 } from "@mui/icons-material";
 import AutoAwesomeRoundedIcon from "@mui/icons-material/AutoAwesomeRounded";
 
 import {
   Box,
   Button,
-  Chip,
-  Container,
   FormControl,
   MenuItem,
   Select,
@@ -31,12 +26,11 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import { useState } from "react";
+
 import { generateAction } from "../generate.action";
 import { GenerateActionState, Generation } from "../generate.types";
-import { toast } from "sonner";
+
 import { useRouter } from "next/navigation";
-import { useQueryClient } from "@tanstack/react-query";
 
 interface createdHomeProps {
   promptData: Generation[];
@@ -89,7 +83,6 @@ const CreateHome = ({ promptData }: createdHomeProps) => {
   );
   useAutoScroll(containerRef, promptData.length);
   useGenerationState(state);
-
   return (
     <Box
       sx={{
@@ -149,7 +142,6 @@ const CreateHome = ({ promptData }: createdHomeProps) => {
           <EmptyState />
         )}
       </Box>
-
       {/* FIXED COMPOSER */}
       <Box
         component="form"

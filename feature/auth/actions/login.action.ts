@@ -11,7 +11,6 @@ import User from "@/models/User";
 
 const loginSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
-
   password: z.string().min(1, "Password is required"),
 });
 
@@ -44,6 +43,7 @@ export async function loginAction(
   }
 
   const { email: userEmail, password: userPassword } = result.data;
+  let redirectPath = "/create";
 
   try {
     await connectDB();
@@ -58,20 +58,17 @@ export async function loginAction(
         hyperLink: "/signup",
       };
     }
-
     const passwordMatch = await bcrypt.compare(userPassword, user.password);
-
     if (!passwordMatch) {
       return {
         error: "Invalid email or password.",
       };
     }
-
     const token = createToken({
       userId: user._id.toString(),
       email: user.email,
+      role: user.role,
     });
-
     const cookieStore = await cookies();
 
     cookieStore.set("access_token", token, {
@@ -81,13 +78,12 @@ export async function loginAction(
       path: "/",
       maxAge: 60 * 60 * 24 * 7,
     });
+    redirectPath = user.role === "admin" ? "/dashboard" : "/create";
   } catch (error) {
     console.error("Login error:", error);
-
     return {
       error: "Something went wrong. Please try again.",
     };
   }
-
-  redirect("/create");
+  redirect(redirectPath);
 }

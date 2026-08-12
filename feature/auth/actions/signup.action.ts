@@ -9,6 +9,8 @@ import User from "@/models/User";
 import { createToken } from "@/lib/auth";
 import { cookies } from "next/headers";
 import Credit from "@/models/Credits";
+import { revalidateTag } from "next/cache";
+import { updateTag } from "next/cache";
 
 const signupSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
@@ -69,8 +71,8 @@ export async function signupAction(
     const token = createToken({
       userId: user._id.toString(),
       email: user.email,
+      role: user.role,
     });
-
     const cookieStore = await cookies();
     cookieStore.set("access_token", token, {
       httpOnly: true,
@@ -79,6 +81,7 @@ export async function signupAction(
       path: "/",
       maxAge: 60 * 60 * 24 * 7,
     });
+    updateTag("dashboard-stats");
   } catch (error) {
     console.error("Signup error:", error);
 

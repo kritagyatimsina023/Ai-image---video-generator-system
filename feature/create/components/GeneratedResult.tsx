@@ -2,11 +2,13 @@ import { AutoAwesomeRounded } from "@mui/icons-material";
 import { Stack, Typography } from "@mui/material";
 
 import { Box } from "@mui/material";
-import React from "react";
+import React, { useState } from "react";
 import { Generation } from "../generate.types";
+import MediaPreviewModal from "./MediaPreviewModal";
 type GeneratedProps = Pick<Generation, "prompt" | "mediaUrl" | "type">;
 
 const GeneratedResult = ({ prompt, mediaUrl, type }: GeneratedProps) => {
+  const [previewOpen, setPreviewOpen] = useState(false);
   return (
     <Box
       sx={{
@@ -55,6 +57,7 @@ const GeneratedResult = ({ prompt, mediaUrl, type }: GeneratedProps) => {
             component="img"
             src={mediaUrl}
             alt={prompt || "Generated image"}
+            onClick={() => setPreviewOpen(true)}
             sx={{
               width: "100%",
               maxWidth: 700,
@@ -63,10 +66,13 @@ const GeneratedResult = ({ prompt, mediaUrl, type }: GeneratedProps) => {
               objectFit: "contain",
               border: "1px solid rgba(59,130,246,.2)",
               boxShadow: "0 0 50px rgba(37,99,246,.12)",
+              "&:hover": {
+                transform: "scale(1.01)",
+                boxShadow: "0 0 70px rgba(37,99,246,.25)",
+              },
             }}
           />
         )}
-
         <Typography
           sx={{
             color: "rgba(255,255,255,.4)",
@@ -77,6 +83,13 @@ const GeneratedResult = ({ prompt, mediaUrl, type }: GeneratedProps) => {
           {prompt}
         </Typography>
       </Stack>
+      <MediaPreviewModal
+        open={previewOpen}
+        onClose={() => setPreviewOpen(false)}
+        mediaUrl={mediaUrl}
+        type={type}
+        prompt={prompt}
+      />
     </Box>
   );
 };

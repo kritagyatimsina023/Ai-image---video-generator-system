@@ -222,7 +222,6 @@ const Navbar = ({ user }: JwtPayload) => {
               sx={{
                 fontWeight: 800,
               }}
-              // letterSpacing="-0.03em"
             >
               AI Studio
             </Typography>

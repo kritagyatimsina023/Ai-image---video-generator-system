@@ -41,13 +41,11 @@ export async function loginAction(
       fieldErrors: result.error.flatten().fieldErrors,
     };
   }
-
   const { email: userEmail, password: userPassword } = result.data;
   let redirectPath = "/create";
 
   try {
     await connectDB();
-
     const user = await User.findOne({
       email: userEmail.toLowerCase(),
     }).select("+password");
@@ -58,6 +56,14 @@ export async function loginAction(
         hyperLink: "/signup",
       };
     }
+
+    if (user.banned) {
+      return {
+        error:
+          "Your account has been banned.Please contact for support assistance",
+      };
+    }
+
     const passwordMatch = await bcrypt.compare(userPassword, user.password);
     if (!passwordMatch) {
       return {

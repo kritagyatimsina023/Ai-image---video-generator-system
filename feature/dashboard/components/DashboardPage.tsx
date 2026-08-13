@@ -1,4 +1,3 @@
-// export const revalidate = 30;
 import {
   AutoAwesomeRounded,
   PeopleRounded,
@@ -8,10 +7,17 @@ import {
 } from "@mui/icons-material";
 
 import { Box, Grid, Stack, Typography } from "@mui/material";
-import { getDashboardStats } from "../actions/getDashboardStats";
+import {
+  getDashboardStats,
+  getRecentActivities,
+} from "../actions/Dashboard.action";
+import Activity from "./Activity";
 
 export default async function DashboardPage() {
-  const statsData = await getDashboardStats();
+  const [statsData, activities] = await Promise.all([
+    getDashboardStats(),
+    getRecentActivities(),
+  ]);
 
   const stats = [
     {
@@ -112,7 +118,6 @@ export default async function DashboardPage() {
       <Grid container spacing={2}>
         {stats.map((stat) => {
           const Icon = stat.icon;
-
           return (
             <Grid
               key={stat.title}
@@ -201,36 +206,8 @@ export default async function DashboardPage() {
           );
         })}
       </Grid>
-
       {/* Recent activity */}
-      <Box
-        sx={{
-          mt: 3,
-          p: 3,
-          borderRadius: 3,
-          background: "rgba(7,16,31,.7)",
-          border: "1px solid rgba(255,255,255,.07)",
-        }}
-      >
-        <Typography
-          sx={{
-            fontSize: 17,
-            fontWeight: 700,
-          }}
-        >
-          Recent Activity
-        </Typography>
-
-        <Typography
-          sx={{
-            mt: 0.5,
-            fontSize: 13,
-            color: "rgba(255,255,255,.4)",
-          }}
-        >
-          Recent users and AI generations will appear here.
-        </Typography>
-      </Box>
+      <Activity activities={activities} />
     </Box>
   );
 }

@@ -11,6 +11,8 @@ import { cookies } from "next/headers";
 import Credit from "@/models/Credits";
 import { revalidateTag } from "next/cache";
 import { updateTag } from "next/cache";
+import Activity from "@/models/Activity";
+import { invalidate } from "@/lib/cache/invalidate";
 
 const signupSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
@@ -81,7 +83,16 @@ export async function signupAction(
       path: "/",
       maxAge: 60 * 60 * 24 * 7,
     });
-    updateTag("dashboard-stats");
+    await Activity.create({
+      userId: user._id,
+      type: "USER_REGISTERED",
+      description: `New User (${user.name}) registered`,
+    });
+    invalidate.signup();
+    // updateTag("dashboard-stats");
+    // updateTag("admin-users");
+    // updateTag("recent-activities");
+    // updateTag("admin-credit-users");
   } catch (error) {
     console.error("Signup error:", error);
 
@@ -89,6 +100,5 @@ export async function signupAction(
       error: "Something went wrong. Please try again.",
     };
   }
-
   redirect("/create");
 }

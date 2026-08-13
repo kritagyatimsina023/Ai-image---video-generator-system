@@ -10,7 +10,7 @@ export interface IUser extends Document {
   password: string;
   avatar?: string;
   role: UserRole;
-
+  banned: boolean;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -43,12 +43,10 @@ const userSchema = new Schema<IUser>(
       type: String,
       default: "",
     },
-
-    // credits: {
-    //   type: Number,
-    //   default: 10,
-    //   min: 0,
-    // },
+    banned: {
+      type: Boolean,
+      default: false,
+    },
     role: {
       type: String,
       enum: ["user", "admin"],

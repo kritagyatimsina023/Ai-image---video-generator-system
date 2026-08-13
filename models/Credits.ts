@@ -1,10 +1,14 @@
 import mongoose, { Schema, Model } from "mongoose";
+export type PlanType = "free" | "starter" | "enterprise";
+
 export interface ICredit {
   userId: mongoose.Types.ObjectId;
-
-  // imageCredits: number;
-  // videoCredits: number;
   credits: number;
+
+  plan: PlanType;
+
+  planStartedAt?: Date;
+  planExpiresAt?: Date;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -23,18 +27,18 @@ const creditSchema = new Schema<ICredit>(
       default: 30,
       min: 0,
     },
+    plan: {
+      type: String,
+      enum: ["free", "starter", "enterprise"],
+      default: "free",
+    },
+    planStartedAt: {
+      type: Date,
+    },
 
-    // imageCredits: {
-    //   type: Number,
-    //   default: 3,
-    //   min: 0,
-    // },
-
-    // videoCredits: {
-    //   type: Number,
-    //   default: 2,
-    //   min: 0,
-    // },
+    planExpiresAt: {
+      type: Date,
+    },
   },
   {
     timestamps: true,

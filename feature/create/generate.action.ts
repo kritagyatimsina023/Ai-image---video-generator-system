@@ -9,6 +9,10 @@ import { getCurrentUser } from "@/lib/getCurrentUser";
 import { GenerateActionState } from "./generate.types";
 import { revalidatePath } from "next/cache";
 import Credit from "@/models/Credits";
+import { updateTag } from "next/cache";
+import Activity from "@/models/Activity";
+import User from "@/models/User";
+import { invalidate } from "@/lib/cache/invalidate";
 
 const DUMMY_IMAGE_URL =
   "https://images.unsplash.com/photo-1519608487953-e999c86e7455";
@@ -26,9 +30,7 @@ export async function generateAction(
   formData: FormData,
 ): Promise<GenerateActionState> {
   try {
-    // 1. Authenticate
     const user = await getCurrentUser();
-
     if (!user) {
       return {
         success: false,
@@ -37,8 +39,11 @@ export async function generateAction(
         generation: null,
       };
     }
+    const userData = await User.findById(user.userId);
+    if (!userData) {
+      throw new Error("No user found");
+    }
 
-    // 2. Extract form data
     const rawData = {
       prompt: formData.get("prompt"),
       type: formData.get("type"),
@@ -47,7 +52,6 @@ export async function generateAction(
     };
     console.log(rawData);
 
-    // 3. Validate
     const validatedData = generateSchema.safeParse(rawData);
 
     if (!validatedData.success) {
@@ -61,12 +65,10 @@ export async function generateAction(
 
     const { prompt, type, model, ratio } = validatedData.data;
 
-    // 4. Connect DB
     await connectDB();
 
     const cost = GENERATION_COST[type];
 
-    // 5. Dummy generation
     const mediaUrl = type === "video" ? DUMMY_VIDEO_URL : DUMMY_IMAGE_URL;
 
     const credit = await Credit.findOne({
@@ -111,7 +113,6 @@ export async function generateAction(
       };
     }
 
-    // 6. Save generation
     const generation = await Generate.create({
       userId: user.userId,
       prompt,
@@ -137,11 +138,24 @@ export async function generateAction(
         },
       );
     }
+    const activityType =
+      type === "image" ? "IMAGE_GENERATED" : "VIDEO_GENERATED";
 
     await new Promise((resolve) => setTimeout(resolve, 4000));
+    await Activity.create({
+      userId: user.userId,
+      type: activityType,
+      description:
+        activityType == "IMAGE_GENERATED"
+          ? `${userData.name} Generated image`
+          : `${userData.name} Generated Video`,
+    });
     revalidatePath("/create");
-
-    // 7. Return serializable data
+    // updateTag("admin-users");
+    // updateTag("dashboard-stats");
+    // updateTag("recent-activities");
+    // updateTag("admin-credit-users");
+    invalidate.userManagement();
     return {
       success: true,
       error: "",

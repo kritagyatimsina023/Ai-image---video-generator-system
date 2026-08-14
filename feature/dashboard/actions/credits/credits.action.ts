@@ -185,7 +185,8 @@ export const deductCredits = async (userId: string, amount: number) => {
   if (!Number.isInteger(amount) || Number(amount) < 0) {
     throw new Error("Invalid credit amount");
   }
-  const user = await User.findById(userId).select("banned").lean();
+  await connectDB();
+  const user = await User.findById(userId).select("name banned").lean();
   if (!user) {
     throw new Error("No user found");
   }
@@ -193,7 +194,6 @@ export const deductCredits = async (userId: string, amount: number) => {
   if (user?.banned) {
     throw new Error("This accound has been banned! Cannot perform action");
   }
-  await connectDB();
   const credit = await Credit.findOneAndUpdate(
     { userId },
     {

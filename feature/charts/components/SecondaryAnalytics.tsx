@@ -22,7 +22,7 @@ const SecondaryAnalytics = ({
   totalCreditsConsumed,
 }: SecondaryProps) => {
   const totalGeneration = imageCount + videoCount;
-  console.log("totalGeneration", totalGeneration);
+  // console.log("totalGeneration", totalGeneration);
   return (
     <Box
       sx={{

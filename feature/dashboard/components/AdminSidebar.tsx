@@ -9,6 +9,7 @@ import {
   MovieCreationRounded,
   LogoutRounded,
 } from "@mui/icons-material";
+import BarChartIcon from "@mui/icons-material/BarChart";
 
 import { Box, Button, Divider, Stack, Typography } from "@mui/material";
 
@@ -36,11 +37,15 @@ const navigation = [
     href: "/dashboard/generations",
     icon: MovieCreationRounded,
   },
+  {
+    label: "Chart",
+    href: "/dashboard/charts",
+    icon: BarChartIcon,
+  },
 ];
 
 export default function AdminSidebar() {
   const pathname = usePathname();
-
   return (
     <Box
       component="aside"
@@ -126,7 +131,6 @@ export default function AdminSidebar() {
             item.href === "/dashboard"
               ? pathname === "/dashboard"
               : pathname.startsWith(item.href);
-
           return (
             <Box
               key={item.href}

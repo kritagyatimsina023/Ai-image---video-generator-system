@@ -8,7 +8,6 @@ import { getCurrentUser } from "@/lib/getCurrentUser";
 import { updateTag } from "next/cache";
 import Activity from "@/models/Activity";
 import { CACHE_TAGS, invalidate } from "@/lib/cache/invalidate";
-// import { checkBannedUser } from "../users/userActions";
 
 export const getCreditUsers = unstable_cache(
   async () => {

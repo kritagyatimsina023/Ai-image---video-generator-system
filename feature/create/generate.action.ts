@@ -9,7 +9,6 @@ import { getCurrentUser } from "@/lib/getCurrentUser";
 import { GenerateActionState } from "./generate.types";
 import { revalidatePath } from "next/cache";
 import Credit from "@/models/Credits";
-import { updateTag } from "next/cache";
 import Activity from "@/models/Activity";
 import User from "@/models/User";
 import { invalidate } from "@/lib/cache/invalidate";
@@ -151,11 +150,7 @@ export async function generateAction(
           : `${userData.name} Generated Video`,
     });
     revalidatePath("/create");
-    // updateTag("admin-users");
-    // updateTag("dashboard-stats");
-    // updateTag("recent-activities");
-    // updateTag("admin-credit-users");
-    invalidate.userManagement();
+    invalidate.generation();
     return {
       success: true,
       error: "",

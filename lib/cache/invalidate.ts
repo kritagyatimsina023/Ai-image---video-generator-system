@@ -5,6 +5,7 @@ export const CACHE_TAGS = {
   credits: "admin-credit-users",
   dashboard: "dashboard-stats",
   activities: "recent-activities",
+  analytics: "generation-analytics",
 } as const;
 
 export const invalidate = {
@@ -23,25 +24,41 @@ export const invalidate = {
   activities() {
     updateTag(CACHE_TAGS.activities);
   },
+
+  analytics() {
+    updateTag(CACHE_TAGS.analytics);
+  },
+
   creditChange() {
     updateTag(CACHE_TAGS.credits);
     updateTag(CACHE_TAGS.users);
     updateTag(CACHE_TAGS.dashboard);
     updateTag(CACHE_TAGS.activities);
   },
+
   signup() {
     updateTag(CACHE_TAGS.users);
     updateTag(CACHE_TAGS.credits);
     updateTag(CACHE_TAGS.dashboard);
     updateTag(CACHE_TAGS.activities);
   },
+
   userStatusChange() {
     updateTag(CACHE_TAGS.users);
     updateTag(CACHE_TAGS.activities);
   },
+
   toggleBanUser() {
     updateTag(CACHE_TAGS.dashboard);
     updateTag(CACHE_TAGS.users);
+    updateTag(CACHE_TAGS.activities);
+  },
+
+  generation() {
+    updateTag(CACHE_TAGS.analytics);
+    updateTag(CACHE_TAGS.credits);
+    updateTag(CACHE_TAGS.users);
+    updateTag(CACHE_TAGS.dashboard);
     updateTag(CACHE_TAGS.activities);
   },
 

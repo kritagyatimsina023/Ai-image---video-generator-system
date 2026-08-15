@@ -23,6 +23,7 @@ import { useActionState } from "react";
 import { loginAction } from "@/feature/auth/actions/login.action";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import { Loader2 } from "lucide-react";
 
 const inputSx = {
   "& .MuiOutlinedInput-root": {
@@ -266,16 +267,6 @@ export default function LoginPage() {
                   },
                 }}
               />
-              {/* {state.error && (
-                <Typography
-                  sx={{
-                    color: "#f87171",
-                    fontSize: 13,
-                  }}
-                >
-                  {state.error}
-                </Typography>
-              )} */}
 
               <Box
                 sx={{
@@ -315,7 +306,23 @@ export default function LoginPage() {
                   },
                 }}
               >
-                {isPending ? "Signing in ...." : "Sign in"}
+                {isPending ? (
+                  <Typography
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 2,
+                      fontSize: 15,
+                      fontWeight: 700,
+                    }}
+                  >
+                    <Loader2 className="animate-spin" />
+                    Signing in
+                  </Typography>
+                ) : (
+                  "Sign in"
+                )}
+                {/* {isPending ? "Signing in ...." : "Sign in"} */}
               </Button>
             </Stack>
 
@@ -341,7 +348,6 @@ export default function LoginPage() {
               </Link>
             </Typography>
           </Box>
-
           <Typography
             sx={{
               color: "rgba(255,255,255,.2)",

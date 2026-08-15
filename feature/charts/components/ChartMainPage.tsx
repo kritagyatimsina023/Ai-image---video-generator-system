@@ -1,53 +1,38 @@
 import { Box } from "@mui/material";
 import ChartHeader from "./ChartHeader";
-import SummaryCards from "./SummaryCards";
-import MainChartArea from "./MainChartArea";
-import SecondaryAnalytics from "./SecondaryAnalytics";
-import { getGenerationAnalytics } from "../chart.action";
-import { calculateChange } from "@/helper/SideFunction";
+import { Suspense } from "react";
+import ChartDataPage from "./ChartDataPage";
+import SummaryCardsSkeleton from "./SummaryCardSkeleton";
+import MainChartSkeleton from "./MainChartSkeleton";
+import SecondaryAnalyticsSkeleton from "./SecondaryAnalyticsSkeleton";
 
-const ChartMainPage = async () => {
-  const analytics = await getGenerationAnalytics();
-  console.log("analytics", analytics);
-  const totalChange = calculateChange(
-    analytics.totalGenerations,
-    analytics.yesterdayTotalGenerations,
-  );
+type ChartMainProps = {
+  searchParams: Promise<{
+    range?: string;
+  }>;
+};
 
-  const imageChange = calculateChange(
-    analytics.imageCount,
-    analytics.yesterdayImageCount,
-  );
+const ChartMainPage = async ({ searchParams }: ChartMainProps) => {
+  const params = await searchParams;
 
-  const videoChange = calculateChange(
-    analytics.videoCount,
-    analytics.yesterdayVideoCount,
-  );
+  const range =
+    params.range === "7d" || params.range === "30d" ? params.range : "24h";
 
   return (
     <Box>
       <ChartHeader />
-
-      <SummaryCards
-        totalGenerations={analytics.totalGenerations}
-        imageCount={analytics.imageCount}
-        videoCount={analytics.videoCount}
-        totalChange={totalChange}
-        imageChange={imageChange}
-        videoChange={videoChange}
-        peakHour={analytics.peakHour}
-      />
-
-      <MainChartArea hourlyData={analytics.hourlyData} />
-
-      <SecondaryAnalytics
-        imageCount={analytics.imageCount}
-        videoCount={analytics.videoCount}
-        peakHour={analytics.peakHour}
-        mostRequestedType={analytics.mostRequestedType}
-        averageRequestsPerHour={analytics.averageRequestsPerHour}
-        totalCreditsConsumed={analytics.totalCreditsConsumed}
-      />
+      <Suspense
+        key={range}
+        fallback={
+          <>
+            <SummaryCardsSkeleton />
+            <MainChartSkeleton />
+            <SecondaryAnalyticsSkeleton />
+          </>
+        }
+      >
+        <ChartDataPage range={range} />
+      </Suspense>
     </Box>
   );
 };

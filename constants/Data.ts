@@ -1,15 +1,14 @@
 import { Plan } from "@/feature/pricing/pricing.type";
 
-export const navbarData = [
+export const getNavbarData = (role: "user" | "admin") => [
   {
     label: "Home",
     href: "/",
   },
   {
-    label: "Create",
-    href: "/create",
+    label: role === "admin" ? "Dashboard" : "Create",
+    href: role === "admin" ? "/dashboard" : "/create",
   },
-
   {
     label: "About",
     href: "/about",

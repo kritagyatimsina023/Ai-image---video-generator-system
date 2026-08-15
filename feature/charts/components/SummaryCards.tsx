@@ -7,14 +7,15 @@ import {
   TrendingUpRounded,
   VideocamRounded,
 } from "@mui/icons-material";
+import { formatHour } from "@/helper/SideFunction";
 interface SummaryProps {
   totalGenerations: number;
   imageCount: number;
   videoCount: number;
 
-  totalChange: number;
-  imageChange: number;
-  videoChange: number;
+  totalChange: number | null;
+  imageChange: number | null;
+  videoChange: number | null;
 
   peakHour: number | null;
 }
@@ -44,27 +45,39 @@ const SummaryCards = ({
         icon={<AutoAwesomeRounded />}
         label="Total Generations"
         value={totalGenerations.toLocaleString()}
-        change={`${totalChange >= 0 ? "+" : ""}${totalChange}%`}
+        change={
+          totalChange === null
+            ? "New"
+            : `${totalChange >= 0 ? "+" : ""}${totalChange}%`
+        }
       />
 
       <AnalyticsCard
         icon={<ImageRounded />}
         label="Images Generated"
         value={imageCount.toLocaleString()}
-        change={`${imageChange >= 0 ? "+" : ""}${imageChange}%`}
+        change={
+          imageChange === null
+            ? "New"
+            : `${imageChange >= 0 ? "+" : ""}${imageChange}%`
+        }
       />
 
       <AnalyticsCard
         icon={<VideocamRounded />}
         label="Videos Generated"
         value={videoCount.toLocaleString()}
-        change={`${videoChange >= 0 ? "+" : ""}${videoChange}%`}
+        change={
+          videoChange === null
+            ? "New"
+            : `${videoChange >= 0 ? "+" : ""}${videoChange}%`
+        }
       />
 
       <AnalyticsCard
         icon={<TrendingUpRounded />}
         label="Peak Hour"
-        value="5 PM"
+        value={`${formatHour(peakHour)}`}
         change="22 requests"
       />
     </Box>

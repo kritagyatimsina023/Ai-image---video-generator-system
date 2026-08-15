@@ -4,6 +4,7 @@ import UserTable from "./UserTable";
 import { getUsers } from "../../actions/users/userActions";
 import { Suspense } from "react";
 import UserTableSkeleton from "./userTableSkeleton";
+import UserTableData from "./UserTableData";
 
 const UserPage = async () => {
   const users = await getUsers();
@@ -58,7 +59,7 @@ const UserPage = async () => {
         </Typography>
       </Stack>
       <Suspense fallback={<UserTableSkeleton />}>
-        <UserTable users={users} />
+        <UserTableData />
       </Suspense>
     </Box>
   );

@@ -11,14 +11,14 @@ import {
 } from "@mui/material";
 import AutoAwesomeRoundedIcon from "@mui/icons-material/AutoAwesomeRounded";
 import Link from "next/link";
-import { navbarData } from "@/constants/Data";
+import { getNavbarData } from "@/constants/Data";
 import { usePathname } from "next/navigation";
-import { getCurrentUser } from "@/lib/getCurrentUser";
 import { useEffect, useState } from "react";
 import { LogoutOutlined } from "@mui/icons-material";
 import { logoutAction } from "@/feature/auth/actions/logout.action";
 import { JwtPayload } from "jsonwebtoken";
 import CreditBalance from "@/feature/create/components/CreditBalance";
+import LogoutDialog from "@/shared/LogoutDialog";
 type User = {
   id: string;
   name: string;
@@ -32,6 +32,7 @@ function UserMenu({ user }: { user: User }) {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
   const open = Boolean(anchorEl);
+  const [loggingOut, setLoggingOut] = useState(false);
 
   const handleOpen = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -39,6 +40,16 @@ function UserMenu({ user }: { user: User }) {
 
   const handleClose = () => {
     setAnchorEl(null);
+  };
+  const handleLogout = async () => {
+    try {
+      setLoggingOut(true);
+      // await new Promise((resolve) => setTimeout(resolve, 3000));
+      await logoutAction();
+    } catch (error) {
+      console.error("Logout failed:", error);
+      setLoggingOut(false);
+    }
   };
 
   return (
@@ -122,9 +133,7 @@ function UserMenu({ user }: { user: User }) {
 
           {/* Logout */}
           <MenuItem
-            onClick={async () => {
-              await logoutAction();
-            }}
+            onClick={handleLogout}
             sx={{
               gap: 1,
               mt: 0.5,
@@ -145,6 +154,7 @@ function UserMenu({ user }: { user: User }) {
           </MenuItem>
         </Menu>
       </Box>
+      <LogoutDialog open={loggingOut} />
     </>
   );
 }
@@ -153,6 +163,8 @@ const Navbar = ({ user }: JwtPayload) => {
   const pathname = usePathname();
   const [showNavBar, setShowNavBar] = useState(true);
 
+  const navBarData = getNavbarData(user?.role ?? "user");
+  console.log(user, "navbar");
   useEffect(() => {
     let lastScrollY = window.scrollY;
     const handleScroll = () => {
@@ -174,138 +186,140 @@ const Navbar = ({ user }: JwtPayload) => {
     };
   }, []);
   return (
-    <Box
-      component="header"
-      sx={{
-        position: "fixed",
-        top: 0,
-        left: 0,
-        zIndex: 1000,
-        width: "100%",
-        backgroundColor: "rgba(0, 0, 0, 0.45)",
-        backdropFilter: "blur(12px)",
-        WebkitBackdropFilter: "blur(12px)",
-        transform: showNavBar ? "translateY(0)" : "translateY(-100%)",
-        transition: "transform 0.3s ease",
-      }}
-    >
-      <Container maxWidth="lg">
-        <Stack
-          direction="row"
-          sx={{
-            height: { xs: 68, md: 76 },
-            alignItems: "center",
-            justifyContent: "space-between",
-          }}
-        >
+    <>
+      <Box
+        component="header"
+        sx={{
+          position: "fixed",
+          top: 0,
+          left: 0,
+          zIndex: 1000,
+          width: "100%",
+          backgroundColor: "rgba(0, 0, 0, 0.45)",
+          backdropFilter: "blur(12px)",
+          WebkitBackdropFilter: "blur(12px)",
+          transform: showNavBar ? "translateY(0)" : "translateY(-100%)",
+          transition: "transform 0.3s ease",
+        }}
+      >
+        <Container maxWidth="lg">
           <Stack
             direction="row"
-            spacing={1.1}
             sx={{
+              height: { xs: 68, md: 76 },
               alignItems: "center",
+              justifyContent: "space-between",
             }}
           >
-            <Box
-              sx={{
-                width: 34,
-                height: 34,
-                display: "grid",
-                placeItems: "center",
-                borderRadius: 2,
-                background: "linear-gradient(135deg, #0ea5ff 0%, #2563eb 100%)",
-                boxShadow: "0 0 28px rgba(37,99,235,.45)",
-              }}
-            >
-              <AutoAwesomeRoundedIcon sx={{ fontSize: 20 }} />
-            </Box>
-            <Typography
-              sx={{
-                fontWeight: 800,
-              }}
-            >
-              AI Studio
-            </Typography>
-          </Stack>
-
-          <Stack
-            direction="row"
-            spacing={3.5}
-            sx={{
-              display: { xs: "none", md: "flex" },
-            }}
-          >
-            {navbarData.map((item) => {
-              const isActive = pathname === item.href;
-
-              return (
-                <Typography
-                  key={item.href}
-                  component={Link}
-                  href={item.href}
-                  sx={{
-                    color: isActive ? "#60a5fa" : "rgba(255,255,255,.65)",
-                    fontSize: 14,
-                    fontWeight: isActive ? 600 : 400,
-                    textDecoration: "none",
-                    transition: "all 0.2s ease",
-
-                    "&:hover": {
-                      color: "#fff",
-                    },
-                  }}
-                >
-                  {item.label}
-                </Typography>
-              );
-            })}
-          </Stack>
-          {user ? (
             <Stack
               direction="row"
-              spacing={1}
+              spacing={1.1}
               sx={{
-                justifyContent: "center",
                 alignItems: "center",
               }}
             >
-              <UserMenu user={user} />
-              <CreditBalance userId={user.userId} />
+              <Box
+                sx={{
+                  width: 34,
+                  height: 34,
+                  display: "grid",
+                  placeItems: "center",
+                  borderRadius: 2,
+                  background:
+                    "linear-gradient(135deg, #0ea5ff 0%, #2563eb 100%)",
+                  boxShadow: "0 0 28px rgba(37,99,235,.45)",
+                }}
+              >
+                <AutoAwesomeRoundedIcon sx={{ fontSize: 20 }} />
+              </Box>
+              <Typography
+                sx={{
+                  fontWeight: 800,
+                }}
+              >
+                AI Studio
+              </Typography>
             </Stack>
-          ) : (
-            <Button
-              component={Link}
-              href="/signup"
-              variant="outlined"
-              sx={{
-                display: { xs: "none", sm: "inline-flex" },
-                borderColor: "rgba(255,255,255,.18)",
-                color: "#fff",
-                borderRadius: 2,
-                px: 2.2,
-                textTransform: "none",
 
-                "&:hover": {
-                  borderColor: "#3b82f6",
-                  bgcolor: "rgba(37,99,235,.08)",
-                },
+            <Stack
+              direction="row"
+              spacing={3.5}
+              sx={{
+                display: { xs: "none", md: "flex" },
               }}
             >
-              Get Started
-            </Button>
-          )}
+              {navBarData.map((item) => {
+                const isActive = pathname === item.href;
+                return (
+                  <Typography
+                    key={item.href}
+                    component={Link}
+                    href={item.href}
+                    sx={{
+                      color: isActive ? "#60a5fa" : "rgba(255,255,255,.65)",
+                      fontSize: 14,
+                      fontWeight: isActive ? 600 : 400,
+                      textDecoration: "none",
+                      transition: "all 0.2s ease",
 
-          <Box
-            sx={{
-              display: { xs: "block", sm: "none" },
-              width: 38,
-              height: 38,
-              border: "1px solid rgba(255,255,255,.12)",
-              borderRadius: 2,
-            }}
-          />
-        </Stack>
-      </Container>
-    </Box>
+                      "&:hover": {
+                        color: "#fff",
+                      },
+                    }}
+                  >
+                    {item.label}
+                  </Typography>
+                );
+              })}
+            </Stack>
+            {user ? (
+              <Stack
+                direction="row"
+                spacing={1}
+                sx={{
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                <UserMenu user={user} />
+                <CreditBalance userId={user.userId} />
+              </Stack>
+            ) : (
+              <Button
+                component={Link}
+                href="/signup"
+                variant="outlined"
+                sx={{
+                  display: { xs: "none", sm: "inline-flex" },
+                  borderColor: "rgba(255,255,255,.18)",
+                  color: "#fff",
+                  borderRadius: 2,
+                  px: 2.2,
+                  textTransform: "none",
+
+                  "&:hover": {
+                    borderColor: "#3b82f6",
+                    bgcolor: "rgba(37,99,235,.08)",
+                  },
+                }}
+              >
+                Get Started
+              </Button>
+            )}
+
+            <Box
+              sx={{
+                display: { xs: "block", sm: "none" },
+                width: 38,
+                height: 38,
+                border: "1px solid rgba(255,255,255,.12)",
+                borderRadius: 2,
+              }}
+            />
+          </Stack>
+        </Container>
+      </Box>
+    </>
   );
 };
 

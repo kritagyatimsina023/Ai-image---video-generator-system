@@ -1,6 +1,7 @@
 import {
   Box,
   Skeleton,
+  Stack,
   Table,
   TableBody,
   TableCell,
@@ -11,10 +12,8 @@ import {
 
 const columns = [
   "User",
-  "Email",
   "Credits",
-  "Images",
-  "Videos",
+  "Generation",
   "Status",
   "Joined",
   "Actions",
@@ -28,24 +27,22 @@ const UserTableSkeleton = () => {
         borderRadius: 3,
         overflow: "hidden",
         background: "rgba(7,16,31,.7)",
-        border: "1px solid rgba(255,255,255,.07)",
+        border: "1px solid rgba(59,130,246,.14)",
       }}
     >
       <Table>
         <TableHead>
-          <TableRow
-            sx={{
-              background: "rgba(15,23,42,.7)",
-            }}
-          >
+          <TableRow>
             {columns.map((column) => (
               <TableCell
                 key={column}
                 sx={{
-                  borderBottom: "1px solid rgba(255,255,255,.07)",
+                  borderBottom: "1px solid rgba(255,255,255,.08)",
                   color: "rgba(255,255,255,.4)",
-                  fontSize: 12,
+                  fontSize: 11,
                   fontWeight: 700,
+                  textTransform: "uppercase",
+                  letterSpacing: ".05em",
                   whiteSpace: "nowrap",
                 }}
               >
@@ -58,165 +55,82 @@ const UserTableSkeleton = () => {
         <TableBody>
           {Array.from({ length: 8 }).map((_, index) => (
             <TableRow key={index}>
-              {/* User */}
-              <TableCell
-                sx={{
-                  borderBottom: "1px solid rgba(255,255,255,.05)",
-                }}
-              >
-                <Box
-                  sx={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 1.5,
-                  }}
-                >
+              {/* USER */}
+              <TableCell sx={bodyCellSx}>
+                <Stack spacing={0.5}>
                   <Skeleton
-                    variant="circular"
-                    width={36}
-                    height={36}
-                    sx={{
-                      bgcolor: "rgba(255,255,255,.08)",
-                    }}
+                    variant="text"
+                    width={110}
+                    height={22}
+                    sx={skeletonSx}
                   />
 
                   <Skeleton
                     variant="text"
-                    width={100}
-                    height={22}
-                    sx={{
-                      bgcolor: "rgba(255,255,255,.08)",
-                    }}
+                    width={160}
+                    height={18}
+                    sx={skeletonSx}
                   />
-                </Box>
+                </Stack>
               </TableCell>
 
-              {/* Email */}
-              <TableCell
-                sx={{
-                  borderBottom: "1px solid rgba(255,255,255,.05)",
-                }}
-              >
+              {/* CREDITS */}
+              <TableCell sx={bodyCellSx}>
                 <Skeleton
                   variant="text"
-                  width={160}
-                  height={22}
-                  sx={{
-                    bgcolor: "rgba(255,255,255,.08)",
-                  }}
+                  width={60}
+                  height={24}
+                  sx={skeletonSx}
                 />
               </TableCell>
 
-              {/* Credits */}
-              <TableCell
-                sx={{
-                  borderBottom: "1px solid rgba(255,255,255,.05)",
-                }}
-              >
-                <Skeleton
-                  variant="rounded"
-                  width={65}
-                  height={28}
-                  sx={{
-                    bgcolor: "rgba(255,255,255,.08)",
-                  }}
-                />
+              {/* GENERATION */}
+              <TableCell sx={bodyCellSx}>
+                <Stack direction="row" spacing={1}>
+                  <Skeleton
+                    variant="rounded"
+                    width={55}
+                    height={26}
+                    sx={skeletonSx}
+                  />
+
+                  <Skeleton
+                    variant="rounded"
+                    width={55}
+                    height={26}
+                    sx={skeletonSx}
+                  />
+                </Stack>
               </TableCell>
 
-              {/* Images */}
-              <TableCell
-                sx={{
-                  borderBottom: "1px solid rgba(255,255,255,.05)",
-                }}
-              >
-                <Skeleton
-                  variant="text"
-                  width={40}
-                  height={22}
-                  sx={{
-                    bgcolor: "rgba(255,255,255,.08)",
-                  }}
-                />
-              </TableCell>
-
-              {/* Videos */}
-              <TableCell
-                sx={{
-                  borderBottom: "1px solid rgba(255,255,255,.05)",
-                }}
-              >
-                <Skeleton
-                  variant="text"
-                  width={40}
-                  height={22}
-                  sx={{
-                    bgcolor: "rgba(255,255,255,.08)",
-                  }}
-                />
-              </TableCell>
-
-              {/* Status */}
-              <TableCell
-                sx={{
-                  borderBottom: "1px solid rgba(255,255,255,.05)",
-                }}
-              >
+              {/* STATUS */}
+              <TableCell sx={bodyCellSx}>
                 <Skeleton
                   variant="rounded"
                   width={70}
                   height={26}
-                  sx={{
-                    bgcolor: "rgba(255,255,255,.08)",
-                  }}
+                  sx={skeletonSx}
                 />
               </TableCell>
 
-              {/* Joined */}
-              <TableCell
-                sx={{
-                  borderBottom: "1px solid rgba(255,255,255,.05)",
-                }}
-              >
+              {/* JOINED */}
+              <TableCell sx={bodyCellSx}>
                 <Skeleton
                   variant="text"
                   width={85}
                   height={22}
-                  sx={{
-                    bgcolor: "rgba(255,255,255,.08)",
-                  }}
+                  sx={skeletonSx}
                 />
               </TableCell>
 
-              {/* Actions */}
-              <TableCell
-                sx={{
-                  borderBottom: "1px solid rgba(255,255,255,.05)",
-                }}
-              >
-                <Box
-                  sx={{
-                    display: "flex",
-                    gap: 0.5,
-                  }}
-                >
-                  <Skeleton
-                    variant="rounded"
-                    width={32}
-                    height={32}
-                    sx={{
-                      bgcolor: "rgba(255,255,255,.08)",
-                    }}
-                  />
-
-                  <Skeleton
-                    variant="rounded"
-                    width={32}
-                    height={32}
-                    sx={{
-                      bgcolor: "rgba(255,255,255,.08)",
-                    }}
-                  />
-                </Box>
+              {/* ACTIONS */}
+              <TableCell sx={bodyCellSx} align="right">
+                <Skeleton
+                  variant="rounded"
+                  width={32}
+                  height={32}
+                  sx={skeletonSx}
+                />
               </TableCell>
             </TableRow>
           ))}
@@ -224,6 +138,14 @@ const UserTableSkeleton = () => {
       </Table>
     </TableContainer>
   );
+};
+
+const bodyCellSx = {
+  borderBottom: "1px solid rgba(255,255,255,.05)",
+};
+
+const skeletonSx = {
+  bgcolor: "rgba(255,255,255,.08)",
 };
 
 export default UserTableSkeleton;

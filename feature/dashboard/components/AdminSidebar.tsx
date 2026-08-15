@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { logoutAction } from "@/feature/auth/actions/logout.action";
 import {
   AutoAwesomeRounded,
@@ -11,10 +12,19 @@ import {
 } from "@mui/icons-material";
 import BarChartIcon from "@mui/icons-material/BarChart";
 
-import { Box, Button, Divider, Stack, Typography } from "@mui/material";
+import {
+  Box,
+  CircularProgress,
+  Dialog,
+  DialogContent,
+  Divider,
+  Stack,
+  Typography,
+} from "@mui/material";
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import LogoutDialog from "@/shared/LogoutDialog";
 
 const navigation = [
   {
@@ -46,166 +56,182 @@ const navigation = [
 
 export default function AdminSidebar() {
   const pathname = usePathname();
+  const [loggingOut, setLoggingOut] = useState(false);
+
+  const handleLogout = async () => {
+    try {
+      setLoggingOut(true);
+      // await new Promise((resolve) => setTimeout(resolve, 3000));
+      await logoutAction();
+    } catch (error) {
+      console.error("Logout failed:", error);
+      setLoggingOut(false);
+    }
+  };
+
   return (
-    <Box
-      component="aside"
-      sx={{
-        display: {
-          xs: "none",
-          md: "flex",
-        },
-        position: "fixed",
-        top: 0,
-        left: 0,
-        bottom: 0,
-        width: 250,
-        flexDirection: "column",
-        borderRight: "1px solid rgba(255,255,255,.08)",
-        background: "rgba(3,7,18,.85)",
-        backdropFilter: "blur(20px)",
-        zIndex: 1000,
-      }}
-    >
-      {/* Logo */}
-      <Stack
-        direction="row"
-        spacing={1.2}
+    <>
+      <Box
+        component="aside"
         sx={{
-          alignItems: "center",
-          px: 3,
-          py: 3,
+          display: {
+            xs: "none",
+            md: "flex",
+          },
+          position: "fixed",
+          top: 0,
+          left: 0,
+          bottom: 0,
+          width: 250,
+          flexDirection: "column",
+          borderRight: "1px solid rgba(255,255,255,.08)",
+          background: "rgba(3,7,18,.85)",
+          backdropFilter: "blur(20px)",
+          zIndex: 1000,
         }}
       >
-        <Box
+        {/* Logo */}
+        <Stack
+          direction="row"
+          spacing={1.2}
           sx={{
-            width: 36,
-            height: 36,
-            display: "grid",
-            placeItems: "center",
-            borderRadius: 2,
-            background: "linear-gradient(135deg, #0ea5ff 0%, #2563eb 100%)",
-            boxShadow: "0 0 28px rgba(37,99,235,.4)",
+            alignItems: "center",
+            px: 3,
+            py: 3,
           }}
         >
-          <AutoAwesomeRounded sx={{ fontSize: 20 }} />
-        </Box>
+          <Box
+            sx={{
+              width: 36,
+              height: 36,
+              display: "grid",
+              placeItems: "center",
+              borderRadius: 2,
+              background: "linear-gradient(135deg, #0ea5ff 0%, #2563eb 100%)",
+              boxShadow: "0 0 28px rgba(37,99,235,.4)",
+            }}
+          >
+            <AutoAwesomeRounded sx={{ fontSize: 20 }} />
+          </Box>
 
+          <Typography
+            sx={{
+              fontWeight: 800,
+              fontSize: 17,
+            }}
+          >
+            AI Studio
+          </Typography>
+        </Stack>
+
+        <Divider
+          sx={{
+            borderColor: "rgba(255,255,255,.08)",
+          }}
+        />
+
+        {/* Admin label */}
         <Typography
           sx={{
-            fontWeight: 800,
-            fontSize: 17,
+            px: 3,
+            pt: 3,
+            pb: 1,
+            fontSize: 11,
+            fontWeight: 700,
+            color: "rgba(255,255,255,.35)",
+            textTransform: "uppercase",
+            letterSpacing: ".08em",
           }}
         >
-          AI Studio
+          Administration
         </Typography>
-      </Stack>
 
-      <Divider
-        sx={{
-          borderColor: "rgba(255,255,255,.08)",
-        }}
-      />
+        {/* Navigation */}
+        <Stack spacing={0.5} sx={{ px: 1.5 }}>
+          {navigation.map((item) => {
+            const Icon = item.icon;
 
-      {/* Admin label */}
-      <Typography
-        sx={{
-          px: 3,
-          pt: 3,
-          pb: 1,
-          fontSize: 11,
-          fontWeight: 700,
-          color: "rgba(255,255,255,.35)",
-          textTransform: "uppercase",
-          letterSpacing: ".08em",
-        }}
-      >
-        Administration
-      </Typography>
+            const isActive =
+              item.href === "/dashboard"
+                ? pathname === "/dashboard"
+                : pathname.startsWith(item.href);
 
-      {/* Navigation */}
-      <Stack spacing={0.5} sx={{ px: 1.5 }}>
-        {navigation.map((item) => {
-          const Icon = item.icon;
-
-          const isActive =
-            item.href === "/dashboard"
-              ? pathname === "/dashboard"
-              : pathname.startsWith(item.href);
-          return (
-            <Box
-              key={item.href}
-              component={Link}
-              href={item.href}
-              sx={{
-                display: "flex",
-                alignItems: "center",
-                gap: 1.5,
-                px: 1.5,
-                py: 1.2,
-                borderRadius: 2,
-                textDecoration: "none",
-
-                color: isActive ? "#60a5fa" : "rgba(255,255,255,.6)",
-
-                background: isActive ? "rgba(37,99,235,.12)" : "transparent",
-
-                border: isActive
-                  ? "1px solid rgba(59,130,246,.18)"
-                  : "1px solid transparent",
-
-                transition: "all .2s ease",
-
-                "&:hover": {
-                  color: "#fff",
-                  background: "rgba(37,99,235,.08)",
-                },
-              }}
-            >
-              <Icon sx={{ fontSize: 20 }} />
-
-              <Typography
+            return (
+              <Box
+                key={item.href}
+                component={Link}
+                href={item.href}
                 sx={{
-                  fontSize: 14,
-                  fontWeight: isActive ? 600 : 400,
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 1.5,
+                  px: 1.5,
+                  py: 1.2,
+                  borderRadius: 2,
+                  textDecoration: "none",
+                  color: isActive ? "#60a5fa" : "rgba(255,255,255,.6)",
+                  background: isActive ? "rgba(37,99,235,.12)" : "transparent",
+                  border: isActive
+                    ? "1px solid rgba(59,130,246,.18)"
+                    : "1px solid transparent",
+                  transition: "all .2s ease",
+
+                  "&:hover": {
+                    color: "#fff",
+                    background: "rgba(37,99,235,.08)",
+                  },
                 }}
               >
-                {item.label}
-              </Typography>
-            </Box>
-          );
-        })}
-      </Stack>
+                <Icon sx={{ fontSize: 20 }} />
 
-      {/* Bottom */}
-      <Box sx={{ mt: "auto", p: 2 }}>
-        <Box
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            gap: 1.5,
-            px: 1.5,
-            py: 1.2,
-            borderRadius: 2,
-            color: "rgba(255,255,255,.5)",
-            cursor: "pointer",
+                <Typography
+                  sx={{
+                    fontSize: 14,
+                    fontWeight: isActive ? 600 : 400,
+                  }}
+                >
+                  {item.label}
+                </Typography>
+              </Box>
+            );
+          })}
+        </Stack>
 
-            "&:hover": {
-              color: "#f87171",
-              background: "rgba(239,68,68,.08)",
-            },
-          }}
-        >
-          <LogoutRounded sx={{ fontSize: 20 }} />
-          <Button
-            onClick={async () => {
-              await logoutAction();
+        {/* Bottom */}
+        <Box sx={{ mt: "auto", p: 2 }}>
+          <Box
+            component="button"
+            onClick={handleLogout}
+            disabled={loggingOut}
+            sx={{
+              width: "100%",
+              display: "flex",
+              alignItems: "center",
+              gap: 1.5,
+              px: 1.5,
+              py: 1.2,
+              borderRadius: 2,
+              border: "none",
+              background: "transparent",
+              color: "rgba(255,255,255,.5)",
+              cursor: loggingOut ? "default" : "pointer",
+              textAlign: "left",
+
+              "&:hover": {
+                color: "#f87171",
+                background: "rgba(239,68,68,.08)",
+              },
             }}
-            sx={{ fontSize: 14 }}
           >
-            Logout
-          </Button>
+            <LogoutRounded sx={{ fontSize: 20 }} />
+
+            <Typography sx={{ fontSize: 12 }}>Logout</Typography>
+          </Box>
         </Box>
       </Box>
-    </Box>
+
+      {/* Logout Dialog */}
+      <LogoutDialog open={loggingOut} />
+    </>
   );
 }

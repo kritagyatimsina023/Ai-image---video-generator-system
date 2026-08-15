@@ -22,7 +22,7 @@ const SecondaryAnalytics = ({
   totalCreditsConsumed,
 }: SecondaryProps) => {
   const totalGeneration = imageCount + videoCount;
-  // console.log("totalGeneration", totalGeneration);
+
   return (
     <Box
       sx={{
@@ -71,7 +71,6 @@ const SecondaryAnalytics = ({
             value={imageCount}
             total={totalGeneration}
           />
-
           <GenerationType
             icon={<VideocamRounded />}
             label="Videos"

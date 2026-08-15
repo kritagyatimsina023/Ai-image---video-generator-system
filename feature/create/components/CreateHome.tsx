@@ -59,11 +59,11 @@ const selectSx = {
   },
 };
 
-const chipSx = {
-  bgcolor: "rgba(37,99,235,.1)",
-  color: "#93c5fd",
-  border: "1px solid rgba(59,130,246,.2)",
-};
+// const chipSx = {
+//   bgcolor: "rgba(37,99,235,.1)",
+//   color: "#93c5fd",
+//   border: "1px solid rgba(59,130,246,.2)",
+// };
 
 const initialState: GenerateActionState = {
   success: false,

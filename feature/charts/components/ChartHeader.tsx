@@ -1,8 +1,22 @@
+"use client";
 import { AutoAwesomeRounded } from "@mui/icons-material";
 import { Box, MenuItem, Select, Stack, Typography } from "@mui/material";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import React from "react";
 
 const ChartHeader = () => {
+  const router = useRouter();
+  const pathName = usePathname();
+  const searchParams = useSearchParams();
+
+  const currentRange = searchParams.get("range") ?? "24h";
+
+  const handleChangeRange = (range: string) => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("range", range);
+    router.push(`${pathName}?${params.toString()}`);
+  };
+
   return (
     <Stack
       direction={{ xs: "column", md: "row" }}
@@ -48,10 +62,10 @@ const ChartHeader = () => {
           Monitor AI generation activity across your platform.
         </Typography>
       </Box>
-
       {/* TIME FILTER */}
       <Select
-        defaultValue="24h"
+        value={currentRange}
+        onChange={(event) => handleChangeRange(event.target.value)}
         size="small"
         sx={{
           minWidth: 130,

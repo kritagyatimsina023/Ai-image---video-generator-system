@@ -7,7 +7,7 @@ import {
   useGenerationState,
 } from "@/feature/create/hooks/useCreate";
 import { useCreateStore } from "@/store/useCreateStore";
-import { useActionState, useRef } from "react";
+import { useActionState, useEffect, useRef, useState } from "react";
 import {
   ArrowDownward,
   ImageRounded,
@@ -31,6 +31,7 @@ import { generateAction } from "../generate.action";
 import { GenerateActionState, Generation } from "../generate.types";
 
 import { useRouter } from "next/navigation";
+import ApiDisabledDialog from "@/shared/ApiDisabledDialog";
 
 interface createdHomeProps {
   promptData: Generation[];
@@ -77,6 +78,8 @@ const CreateHome = ({ promptData }: createdHomeProps) => {
     useCreateStore();
   const containerRef = useRef<HTMLDivElement | null>(null);
   const router = useRouter();
+  const [showApiDialog, setShowApiDialog] = useState(true);
+
   const [state, formAction, isPending] = useActionState(
     generateAction,
     initialState,
@@ -84,139 +87,144 @@ const CreateHome = ({ promptData }: createdHomeProps) => {
   useAutoScroll(containerRef, promptData.length);
   useGenerationState(state);
   return (
-    <Box
-      sx={{
-        height: "100vh",
-        bgcolor: "#000",
-        color: "#fff",
-        display: "flex",
-        flexDirection: "column",
-        overflow: "hidden",
-      }}
-    >
-      {/* SCROLLABLE RESULTS */}
+    <>
+      <ApiDisabledDialog
+        open={showApiDialog}
+        onClose={() => setShowApiDialog(false)}
+      />
       <Box
-        ref={containerRef}
         sx={{
-          flex: 1,
-          minHeight: 0,
-          overflowY: "auto",
-          px: { xs: 1, md: 3 },
-          // py: { xs: 3, md: 20 },
-
-          "&::-webkit-scrollbar": {
-            width: 6,
-          },
-
-          "&::-webkit-scrollbar-thumb": {
-            background: "rgba(255,255,255,.12)",
-            borderRadius: 10,
-          },
-
-          "&::-webkit-scrollbar-track": {
-            background: "transparent",
-          },
-        }}
-      >
-        {isPending ? (
-          <GeneratingUI type={type} />
-        ) : promptData.length > 0 ? (
-          <Stack
-            spacing={3}
-            sx={{
-              maxWidth: 900,
-              mx: "auto",
-              pt: 13,
-            }}
-          >
-            {promptData.map((item) => (
-              <GeneratedResult
-                key={item.id}
-                type={item.type}
-                mediaUrl={item.mediaUrl}
-                prompt={item.prompt}
-              />
-            ))}
-          </Stack>
-        ) : (
-          <EmptyState />
-        )}
-      </Box>
-      {/* FIXED COMPOSER */}
-      <Box
-        component="form"
-        action={formAction}
-        sx={{
-          flexShrink: 0,
-          width: "100%",
-
-          px: {
-            xs: 1.5,
-            sm: 3,
-            md: 4,
-          },
-
-          pb: {
-            xs: 1.5,
-            md: 2.5,
-          },
-
-          pt: 1,
-
+          height: "100vh",
           bgcolor: "#000",
+          color: "#fff",
+          display: "flex",
+          flexDirection: "column",
+          overflow: "hidden",
         }}
       >
+        {/* SCROLLABLE RESULTS */}
         <Box
+          ref={containerRef}
           sx={{
-            width: "100%",
-            maxWidth: 900,
-            mx: "auto",
+            flex: 1,
+            minHeight: 0,
+            overflowY: "auto",
+            px: { xs: 1, md: 3 },
+            // py: { xs: 3, md: 20 },
 
-            p: { xs: 1.5, md: 2 },
+            "&::-webkit-scrollbar": {
+              width: 6,
+            },
 
-            borderRadius: 4,
-            border: "1px solid rgba(59,130,246,.2)",
+            "&::-webkit-scrollbar-thumb": {
+              background: "rgba(255,255,255,.12)",
+              borderRadius: 10,
+            },
 
-            bgcolor: "rgba(4,9,18,.88)",
-            backdropFilter: "blur(20px)",
-
-            boxShadow: "0 20px 60px rgba(0,0,0,.5)",
+            "&::-webkit-scrollbar-track": {
+              background: "transparent",
+            },
           }}
         >
-          {/* Prompt */}
-          {state.error && (
-            <Box
+          {isPending ? (
+            <GeneratingUI type={type} />
+          ) : promptData.length > 0 ? (
+            <Stack
+              spacing={3}
               sx={{
-                display: "flex",
-                flexDirection: "row",
-                alignItems: "center",
-                justifyContent: "space-between",
-                gap: 2,
-                p: 1.5,
-                borderRadius: 2,
-                // border: "1px solid rgba(239, 68, 68, 0.25)",
-                bgcolor: "rgba(239, 68, 68, 0.08)",
+                maxWidth: 900,
+                mx: "auto",
+                pt: 13,
               }}
             >
-              <Typography
+              {promptData.map((item) => (
+                <GeneratedResult
+                  key={item.id}
+                  type={item.type}
+                  mediaUrl={item.mediaUrl}
+                  prompt={item.prompt}
+                />
+              ))}
+            </Stack>
+          ) : (
+            <EmptyState />
+          )}
+        </Box>
+        {/* FIXED COMPOSER */}
+        <Box
+          component="form"
+          action={formAction}
+          sx={{
+            flexShrink: 0,
+            width: "100%",
+
+            px: {
+              xs: 1.5,
+              sm: 3,
+              md: 4,
+            },
+
+            pb: {
+              xs: 1.5,
+              md: 2.5,
+            },
+
+            pt: 1,
+
+            bgcolor: "#000",
+          }}
+        >
+          <Box
+            sx={{
+              width: "100%",
+              maxWidth: 900,
+              mx: "auto",
+
+              p: { xs: 1.5, md: 2 },
+
+              borderRadius: 4,
+              border: "1px solid rgba(59,130,246,.2)",
+
+              bgcolor: "rgba(4,9,18,.88)",
+              backdropFilter: "blur(20px)",
+
+              boxShadow: "0 20px 60px rgba(0,0,0,.5)",
+            }}
+          >
+            {/* Prompt */}
+            {state.error && (
+              <Box
                 sx={{
-                  fontSize: 13,
-                  fontWeight: 600,
+                  display: "flex",
+                  flexDirection: "row",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  gap: 2,
+                  p: 1.5,
+                  borderRadius: 2,
+                  // border: "1px solid rgba(239, 68, 68, 0.25)",
+                  bgcolor: "rgba(239, 68, 68, 0.08)",
                 }}
               >
-                {state.error}
-              </Typography>
+                <Typography
+                  sx={{
+                    fontSize: 13,
+                    fontWeight: 600,
+                  }}
+                >
+                  {state.error}
+                </Typography>
 
-              <Button
-                variant="contained"
-                size="small"
-                onClick={() => router.push("/pricing")}
-              >
-                Buy Credits
-              </Button>
-            </Box>
-          )}
-          {/* <Typography
+                <Button
+                  variant="contained"
+                  size="small"
+                  onClick={() => router.push("/pricing")}
+                >
+                  Buy Credits
+                </Button>
+              </Box>
+            )}
+            {/* <Typography
             sx={{
               fontSize: 13,
               fontWeight: 600,
@@ -226,200 +234,203 @@ const CreateHome = ({ promptData }: createdHomeProps) => {
             Your Prompt
           </Typography> */}
 
-          <TextField
-            fullWidth
-            multiline
-            name="prompt"
-            minRows={2}
-            maxRows={8}
-            value={prompt}
-            onChange={(e) => setPrompt(e.target.value)}
-            placeholder="Describe what you want to create..."
-            sx={{
-              "& .MuiOutlinedInput-root": {
-                color: "#fff",
-                borderRadius: 2.5,
-                bgcolor: "rgba(0,0,0,.4)",
+            <TextField
+              fullWidth
+              multiline
+              name="prompt"
+              minRows={2}
+              maxRows={8}
+              value={prompt}
+              onChange={(e) => setPrompt(e.target.value)}
+              placeholder="Describe what you want to create..."
+              sx={{
+                "& .MuiOutlinedInput-root": {
+                  color: "#fff",
+                  borderRadius: 2.5,
+                  bgcolor: "rgba(0,0,0,.4)",
 
-                "& fieldset": {
-                  borderColor: "rgba(255,255,255,.12)",
+                  "& fieldset": {
+                    borderColor: "rgba(255,255,255,.12)",
+                  },
+
+                  "&:hover fieldset": {
+                    borderColor: "rgba(59,130,246,.45)",
+                  },
+
+                  "&.Mui-focused fieldset": {
+                    borderColor: "#3b82f6",
+                    boxShadow: "0 0 0 3px rgba(59,130,246,.1)",
+                  },
                 },
 
-                "&:hover fieldset": {
-                  borderColor: "rgba(59,130,246,.45)",
+                "& textarea::placeholder": {
+                  color: "rgba(255,255,255,.3)",
+                  opacity: 1,
                 },
+              }}
+            />
 
-                "&.Mui-focused fieldset": {
-                  borderColor: "#3b82f6",
-                  boxShadow: "0 0 0 3px rgba(59,130,246,.1)",
-                },
-              },
-
-              "& textarea::placeholder": {
-                color: "rgba(255,255,255,.3)",
-                opacity: 1,
-              },
-            }}
-          />
-
-          {/* Controls */}
-          <Stack
-            direction="row"
-            sx={{
-              justifyContent: "space-between",
-              alignItems: "center",
-              gap: 2,
-              mt: 1.5,
-            }}
-          >
-            {/* Left controls */}
+            {/* Controls */}
             <Stack
               direction="row"
-              spacing={1}
               sx={{
-                minWidth: 0,
-                overflowX: "auto",
+                justifyContent: "space-between",
+                alignItems: "center",
+                gap: 2,
+                mt: 1.5,
               }}
             >
-              {/* Type */}
-              <FormControl size="small">
-                <Select
-                  value={type}
-                  name="type"
-                  onChange={(e: SelectChangeEvent) =>
-                    setType(e.target.value as "image" | "video")
-                  }
-                  IconComponent={ArrowDownward}
-                  sx={selectSx}
-                  MenuProps={{
-                    slotProps: {
-                      paper: {
-                        sx: {
-                          backgroundColor: "rgba(0, 0, 0, 0.75)",
-                          backgroundImage: "none",
-                          backdropFilter: "blur(14px)",
-                          border: "1px solid rgba(59, 130, 246, 0.2)",
-                          color: "#fff",
+              {/* Left controls */}
+              <Stack
+                direction="row"
+                spacing={1}
+                sx={{
+                  minWidth: 0,
+                  overflowX: "auto",
+                }}
+              >
+                {/* Type */}
+                <FormControl size="small">
+                  <Select
+                    value={type}
+                    name="type"
+                    onChange={(e: SelectChangeEvent) =>
+                      setType(e.target.value as "image" | "video")
+                    }
+                    IconComponent={ArrowDownward}
+                    sx={selectSx}
+                    MenuProps={{
+                      slotProps: {
+                        paper: {
+                          sx: {
+                            backgroundColor: "rgba(0, 0, 0, 0.75)",
+                            backgroundImage: "none",
+                            backdropFilter: "blur(14px)",
+                            border: "1px solid rgba(59, 130, 246, 0.2)",
+                            color: "#fff",
+                          },
                         },
                       },
-                    },
-                  }}
-                >
-                  <MenuItem value="image">
-                    <Stack
-                      direction="row"
-                      spacing={1}
-                      sx={{
-                        alignItems: "center",
-                      }}
-                    >
-                      <ImageRounded fontSize="small" />
-                      <span>Image</span>
-                    </Stack>
-                  </MenuItem>
+                    }}
+                  >
+                    <MenuItem value="image">
+                      <Stack
+                        direction="row"
+                        spacing={1}
+                        sx={{
+                          alignItems: "center",
+                        }}
+                      >
+                        <ImageRounded fontSize="small" />
+                        <span>Image</span>
+                      </Stack>
+                    </MenuItem>
 
-                  <MenuItem value="video">
-                    <Stack
-                      direction="row"
-                      sx={{
-                        alignItems: "center",
-                      }}
-                      spacing={1}
-                    >
-                      <MovieCreationRounded fontSize="small" />
-                      <span>Video</span>
-                    </Stack>
-                  </MenuItem>
-                </Select>
-              </FormControl>
+                    <MenuItem value="video">
+                      <Stack
+                        direction="row"
+                        sx={{
+                          alignItems: "center",
+                        }}
+                        spacing={1}
+                      >
+                        <MovieCreationRounded fontSize="small" />
+                        <span>Video</span>
+                      </Stack>
+                    </MenuItem>
+                  </Select>
+                </FormControl>
 
-              {/* Model */}
-              <FormControl size="small">
-                <Select
-                  value={model}
-                  name="model"
-                  onChange={(e: SelectChangeEvent) =>
-                    setModel(e.target.value as "GPT" | "Gemini" | "Claude")
-                  }
-                  IconComponent={ArrowDownward}
-                  sx={selectSx}
-                  MenuProps={{
-                    slotProps: {
-                      paper: {
-                        sx: {
-                          backgroundColor: "rgba(0, 0, 0, 0.75)",
-                          backgroundImage: "none",
-                          backdropFilter: "blur(14px)",
-                          border: "1px solid rgba(59, 130, 246, 0.2)",
-                          color: "#fff",
+                {/* Model */}
+                <FormControl size="small">
+                  <Select
+                    value={model}
+                    name="model"
+                    onChange={(e: SelectChangeEvent) =>
+                      setModel(e.target.value as "GPT" | "Gemini" | "Claude")
+                    }
+                    IconComponent={ArrowDownward}
+                    sx={selectSx}
+                    MenuProps={{
+                      slotProps: {
+                        paper: {
+                          sx: {
+                            backgroundColor: "rgba(0, 0, 0, 0.75)",
+                            backgroundImage: "none",
+                            backdropFilter: "blur(14px)",
+                            border: "1px solid rgba(59, 130, 246, 0.2)",
+                            color: "#fff",
+                          },
                         },
                       },
-                    },
-                  }}
-                >
-                  <MenuItem value="GPT">GPT</MenuItem>
-                  <MenuItem value="Gemini">Gemini</MenuItem>
-                  <MenuItem value="Claude">Claude</MenuItem>
-                </Select>
-              </FormControl>
+                    }}
+                  >
+                    <MenuItem value="GPT">GPT</MenuItem>
+                    <MenuItem value="Gemini">Gemini</MenuItem>
+                    <MenuItem value="Claude">Claude</MenuItem>
+                  </Select>
+                </FormControl>
 
-              {/* Ratio */}
-              <FormControl size="small">
-                <Select
-                  value={ratio}
-                  name="ratio"
-                  onChange={(e: SelectChangeEvent) =>
-                    setRatio(e.target.value as "16:9" | "1:1" | "9:16" | "4:3")
-                  }
-                  IconComponent={ArrowDownward}
-                  sx={selectSx}
-                  MenuProps={{
-                    slotProps: {
-                      paper: {
-                        sx: {
-                          backgroundColor: "rgba(0, 0, 0, 0.75)",
-                          backgroundImage: "none",
-                          backdropFilter: "blur(14px)",
-                          border: "1px solid rgba(59, 130, 246, 0.2)",
-                          color: "#fff",
+                {/* Ratio */}
+                <FormControl size="small">
+                  <Select
+                    value={ratio}
+                    name="ratio"
+                    onChange={(e: SelectChangeEvent) =>
+                      setRatio(
+                        e.target.value as "16:9" | "1:1" | "9:16" | "4:3",
+                      )
+                    }
+                    IconComponent={ArrowDownward}
+                    sx={selectSx}
+                    MenuProps={{
+                      slotProps: {
+                        paper: {
+                          sx: {
+                            backgroundColor: "rgba(0, 0, 0, 0.75)",
+                            backgroundImage: "none",
+                            backdropFilter: "blur(14px)",
+                            border: "1px solid rgba(59, 130, 246, 0.2)",
+                            color: "#fff",
+                          },
                         },
                       },
-                    },
-                  }}
-                >
-                  <MenuItem value="16:9">16:9</MenuItem>
-                  <MenuItem value="1:1">1:1</MenuItem>
-                  <MenuItem value="9:16">9:16</MenuItem>
-                  <MenuItem value="4:3">4:3</MenuItem>
-                </Select>
-              </FormControl>
+                    }}
+                  >
+                    <MenuItem value="16:9">16:9</MenuItem>
+                    <MenuItem value="1:1">1:1</MenuItem>
+                    <MenuItem value="9:16">9:16</MenuItem>
+                    <MenuItem value="4:3">4:3</MenuItem>
+                  </Select>
+                </FormControl>
+              </Stack>
+
+              {/* Generate */}
+              <Button
+                type="submit"
+                disabled={isPending}
+                startIcon={<AutoAwesomeRoundedIcon />}
+                variant="contained"
+                sx={{
+                  minWidth: { xs: 100, sm: 150 },
+                  minHeight: 40,
+                  flexShrink: 0,
+                  borderRadius: 2,
+                  textTransform: "none",
+                  fontWeight: 700,
+
+                  background: "linear-gradient(135deg, #1688ff, #2563eb)",
+
+                  boxShadow: "0 8px 28px rgba(37,99,235,.28)",
+                }}
+              >
+                {isPending ? "Generating..." : "Generate"}
+              </Button>
             </Stack>
-
-            {/* Generate */}
-            <Button
-              type="submit"
-              disabled={isPending}
-              startIcon={<AutoAwesomeRoundedIcon />}
-              variant="contained"
-              sx={{
-                minWidth: { xs: 100, sm: 150 },
-                minHeight: 40,
-                flexShrink: 0,
-                borderRadius: 2,
-                textTransform: "none",
-                fontWeight: 700,
-
-                background: "linear-gradient(135deg, #1688ff, #2563eb)",
-
-                boxShadow: "0 8px 28px rgba(37,99,235,.28)",
-              }}
-            >
-              {isPending ? "Generating..." : "Generate"}
-            </Button>
-          </Stack>
+          </Box>
         </Box>
       </Box>
-    </Box>
+    </>
   );
 };
 

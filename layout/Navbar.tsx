@@ -14,7 +14,7 @@ import Link from "next/link";
 import { getNavbarData } from "@/constants/Data";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import { LogoutOutlined } from "@mui/icons-material";
+import { CloseRounded, LogoutOutlined } from "@mui/icons-material";
 import { logoutAction } from "@/feature/auth/actions/logout.action";
 import { JwtPayload } from "jsonwebtoken";
 import CreditBalance from "@/feature/create/components/CreditBalance";
@@ -162,6 +162,7 @@ function UserMenu({ user }: { user: User }) {
 const Navbar = ({ user }: JwtPayload) => {
   const pathname = usePathname();
   const [showNavBar, setShowNavBar] = useState(true);
+  const [showDevNote, setShowDevNote] = useState(true);
 
   const navBarData = getNavbarData(user?.role ?? "user");
   console.log(user, "navbar");
@@ -187,19 +188,99 @@ const Navbar = ({ user }: JwtPayload) => {
   }, []);
   return (
     <>
+      {showDevNote && (
+        <Box
+          sx={{
+            position: "relative",
+            top: 0,
+            left: 0,
+            zIndex: 1100,
+            width: "100%",
+            py: 0.8,
+            px: 2,
+            pr: { xs: 5, sm: 6 },
+            textAlign: "center",
+
+            background:
+              "linear-gradient(90deg, rgba(14,165,233,.14), rgba(37,99,235,.22), rgba(99,102,241,.14))",
+
+            borderBottom: "1px solid rgba(59,130,246,.2)",
+
+            backdropFilter: "blur(14px)",
+            WebkitBackdropFilter: "blur(14px)",
+
+            boxShadow: "0 4px 30px rgba(37,99,235,.08)",
+          }}
+        >
+          <Typography
+            sx={{
+              fontSize: {
+                xs: 10,
+                sm: 11,
+                md: 12,
+              },
+              fontWeight: 600,
+              letterSpacing: ".01em",
+              color: "rgba(255,255,255,.7)",
+              lineHeight: 1.5,
+            }}
+          >
+            <Box
+              component="span"
+              sx={{
+                color: "#60a5fa",
+                fontWeight: 800,
+              }}
+            >
+              ✦ NOTE:
+            </Box>{" "}
+            Currently under development — this application is deployed for
+            production-environment testing.
+          </Typography>
+
+          <Button
+            onClick={() => setShowDevNote(false)}
+            aria-label="Close development notice"
+            sx={{
+              position: "absolute",
+              right: { xs: 8, sm: 16 },
+              top: "50%",
+              transform: "translateY(-50%)",
+
+              minWidth: 28,
+              width: 28,
+              height: 28,
+              p: 0,
+
+              color: "rgba(255,255,255,.55)",
+              borderRadius: "50%",
+
+              "&:hover": {
+                color: "#fff",
+                backgroundColor: "rgba(255,255,255,.08)",
+              },
+            }}
+          >
+            <CloseRounded sx={{ fontSize: 18 }} />
+          </Button>
+        </Box>
+      )}
       <Box
         component="header"
         sx={{
           position: "fixed",
-          top: 0,
+          top: showDevNote ? 19 : 0,
           left: 0,
           zIndex: 1000,
           width: "100%",
+
           backgroundColor: "rgba(0, 0, 0, 0.45)",
           backdropFilter: "blur(12px)",
           WebkitBackdropFilter: "blur(12px)",
+
           transform: showNavBar ? "translateY(0)" : "translateY(-100%)",
-          transition: "transform 0.3s ease",
+
+          transition: "transform 0.3s ease, top 0.25s ease",
         }}
       >
         <Container maxWidth="lg">
@@ -232,6 +313,7 @@ const Navbar = ({ user }: JwtPayload) => {
               >
                 <AutoAwesomeRoundedIcon sx={{ fontSize: 20 }} />
               </Box>
+
               <Typography
                 sx={{
                   fontWeight: 800,
@@ -250,6 +332,7 @@ const Navbar = ({ user }: JwtPayload) => {
             >
               {navBarData.map((item) => {
                 const isActive = pathname === item.href;
+
                 return (
                   <Typography
                     key={item.href}
@@ -272,6 +355,7 @@ const Navbar = ({ user }: JwtPayload) => {
                 );
               })}
             </Stack>
+
             {user ? (
               <Stack
                 direction="row"
@@ -290,7 +374,11 @@ const Navbar = ({ user }: JwtPayload) => {
                 href="/signup"
                 variant="outlined"
                 sx={{
-                  display: { xs: "none", sm: "inline-flex" },
+                  display: {
+                    xs: "none",
+                    sm: "inline-flex",
+                  },
+
                   borderColor: "rgba(255,255,255,.18)",
                   color: "#fff",
                   borderRadius: 2,
@@ -299,7 +387,7 @@ const Navbar = ({ user }: JwtPayload) => {
 
                   "&:hover": {
                     borderColor: "#3b82f6",
-                    bgcolor: "rgba(37,99,235,.08)",
+                    bgcolor: "rgba(37,130,235,.08)",
                   },
                 }}
               >
@@ -309,9 +397,14 @@ const Navbar = ({ user }: JwtPayload) => {
 
             <Box
               sx={{
-                display: { xs: "block", sm: "none" },
+                display: {
+                  xs: "block",
+                  sm: "none",
+                },
+
                 width: 38,
                 height: 38,
+
                 border: "1px solid rgba(255,255,255,.12)",
                 borderRadius: 2,
               }}
